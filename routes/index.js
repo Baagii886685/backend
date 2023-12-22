@@ -2,10 +2,13 @@ const express = require("express"); //import express
 const router = express.Router();
 
 const {
-test
+test,
+login,
+userRegister
 } = require("../controller/HomeController");
 // const { userAdd } = require("../controller/usersController");
 
 router.route("/login").post(test);
+router.route("/login1").post(userRegister);
 
 module.exports = router;
