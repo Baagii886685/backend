@@ -6,6 +6,6 @@ test
 } = require("../controller/HomeController");
 // const { userAdd } = require("../controller/usersController");
 
-router.route("/").post(test);
+router.route("/login").post(test);
 
 module.exports = router;

@@ -21,6 +21,12 @@ var Color = require("colors");
 
 const dotenv = require("dotenv");
 
+//route оруулж ирэх
+const myRouter = require("./routes/index.js");
+
+// dotenv.config({ path: "./config/config.env" });
+// dotenv.config({ path: "./.env" });
+app.use("/data", myRouter);
 
 dotenv.config({ path: "./config/config.env" });
 
