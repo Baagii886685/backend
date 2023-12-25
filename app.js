@@ -1,6 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 
+const errorHandler = require("./middleware/error");
 
 const bodyParser = require("body-parser");
 
@@ -25,16 +26,18 @@ const dotenv = require("dotenv");
 const myRouter = require("./routes/index.js");
 
 // dotenv.config({ path: "./config/config.env" });
-// dotenv.config({ path: "./.env" });
 app.use("/data", myRouter);
 
-dotenv.config({ path: "./config/config.env" });
+dotenv.config({ path: "./.env" });
+// dotenv.config({ path: "./config/config.env" });
 
 
 process.env;
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
+
+app.use(errorHandler);
 
 const connectDB = require("./config/db");
 connectDB();
