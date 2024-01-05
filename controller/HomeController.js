@@ -1,6 +1,6 @@
 //моделууд
 const users = require("../models/user");
-
+const infoNews = require("../models/infoNews");
 
 //middleware
 const MyError = require("../utils/MyError");
@@ -9,15 +9,57 @@ const path = require("path");
 
 
 //функцууд
- const test = asyncHandler(async (req, res, next) => {
-    console.log("хүсэлт ирлээ");
-    console.log("data =>", req.body);
-});
-// const login = asyncHandler(async (req, res, next) => {
-//     console.log("login функц-д хүсэлт ирлээ");
-//     console.log("data =>", req.body);
-// });
+ const medeeHarah = asyncHandler(async (req, res, next) => {
+  const allNewsInfo = await infoNews.find();
+  res.status(200).json({
+    success: true,
+    data: allNewsInfo,
+  });
 
+});
+
+//Шинэ мэдээ мэдээлэл оруулахад энэ функц дуудагдана. --мэдээний гарчиг, зураг текст бүгд орж ирнэ.
+ const medeeHadgalah = asyncHandler(async (req, res, next) =>{
+   const file = req.files;
+   console.log("req.body=>", req.body);
+   //Ирсэн зургын нэрийг өөрчлөх
+   file.fileOne.name = `infoPhoto_${file.fileOne.md5}${path.parse(file.fileOne.name).ext}`;
+   file.fileTwo.name = `infoPhoto_${file.fileTwo.md5}${path.parse(file.fileTwo.name).ext}`;
+ //Зургыг public folder ийн infoPhoto руу зөөх 
+   file.fileOne.mv(`${process.env.INFO_PHOTO_UPLOAD_PATH}/${file.fileOne.name}`, (err) => {
+    if (err) {
+      throw new MyError(
+        "файлыг хуулах явцад алдаа гарлаа. ",
+        err.message,
+        400
+      );
+    }
+  });
+   file.fileTwo.mv(`${process.env.INFO_PHOTO_UPLOAD_PATH}/${file.fileTwo.name}`, (err) => {
+    if (err) {
+      throw new MyError(
+        "файлыг хуулах явцад алдаа гарлаа. ",
+        err.message,
+        400
+      );
+    }
+  });
+  const infoNewsData = {
+    infoTitle : req.body.titleText,
+    textOne: req.body.textarea1,
+    photoOne: `${process.env.INFO_PHOTO_UPLOAD_PATH}/${file.fileOne.name}`,
+    textTwo: req.body.textarea2,
+    photoTwo: `${process.env.INFO_PHOTO_UPLOAD_PATH}/${file.fileTwo.name}`,
+    textThree: req.body.textarea3,
+    createUserId: req.body.userId,
+  }
+  const myData = new infoNews(infoNewsData);
+  await myData.save();
+  res.status(200).json({
+    success: true,
+    data: "aмжилттай хадгалагдлаа",
+  });
+ });
 
 // Хэрэглэгч нэвтрэх
 const login = asyncHandler(async (req, res, next) => {
@@ -58,14 +100,6 @@ const login = asyncHandler(async (req, res, next) => {
       });
     }
   }
-
-  //тухайн хэрэглэгчийг хайна
-  // console.log("object: ", user);
-
-  // if(!ok){
-  //     throw new MyError("email эсвэл нууц үг буруу байна", 401);
-  // }
-  // console.log("torol : ", user.torol);
 });
 
 //хэрэглэгч бүртгэх
@@ -100,7 +134,9 @@ const userRegister = asyncHandler(async (req, res, next) => {
     });
   });
 module.exports = {
-test,
+
 login,
-userRegister
+userRegister,
+medeeHadgalah,
+medeeHarah,
 };

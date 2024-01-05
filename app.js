@@ -17,7 +17,8 @@ app.use(
     // callback(null, true);asdfasdfsdfasdfasdfasdfasdf
   })
 );
-
+const fileUpload = require("express-fileupload");
+app.use(fileUpload());
 var Color = require("colors");
 
 const dotenv = require("dotenv");
@@ -31,6 +32,7 @@ app.use("/data", myRouter);
 dotenv.config({ path: "./.env" });
 // dotenv.config({ path: "./config/config.env" });
 
+app.use("/public", express.static("./public"));
 
 process.env;
 app.use(bodyParser.urlencoded({ extended: true }));
