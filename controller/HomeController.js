@@ -1,3 +1,4 @@
+const { MongoClient, ObjectID } = require('mongodb');
 //моделууд
 const users = require("../models/user");
 const infoNews = require("../models/infoNews");
@@ -17,6 +18,26 @@ const path = require("path");
   });
 
 });
+
+//нийтлэл устгах аргумент нь мэдээний id ирнэ
+const infoDelete = asyncHandler(async (req, res, next) => {
+  console.log("req.body =>", req.body.myData);
+  // const objectId = new ObjectID(req.body.myData);
+
+  const result = await infoNews.deleteOne({ _id: req.body.myData });
+  console.log("result =>", result);
+  if(result.acknowledged===true){
+    res.status(200).json({
+      success: true,
+      data: "Устгагдлаа",
+    });
+  }else {
+    res.status(200).json({
+      success: true,
+      data: "Устгахад алдаа гарлаа",
+    });
+  }
+})
 
 //Шинэ мэдээ мэдээлэл оруулахад энэ функц дуудагдана. --мэдээний гарчиг, зураг текст бүгд орж ирнэ.
  const medeeHadgalah = asyncHandler(async (req, res, next) =>{
@@ -139,4 +160,5 @@ login,
 userRegister,
 medeeHadgalah,
 medeeHarah,
+infoDelete,
 };
