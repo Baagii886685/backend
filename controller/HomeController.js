@@ -21,11 +21,11 @@ const path = require("path");
 
 //нийтлэл устгах аргумент нь мэдээний id ирнэ
 const infoDelete = asyncHandler(async (req, res, next) => {
-  console.log("req.body =>", req.body.myData);
+  // console.log("req.body =>", req.body.myData);
   // const objectId = new ObjectID(req.body.myData);
 
   const result = await infoNews.deleteOne({ _id: req.body.myData });
-  console.log("result =>", result);
+  // console.log("result =>", result);
   if(result.acknowledged===true){
     res.status(200).json({
       success: true,
