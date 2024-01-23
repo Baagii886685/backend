@@ -23,10 +23,10 @@ const userSchema = new mongoose.Schema({
         trim: true,
         maxLength: [50, "нэрний урт дээд тал нь 50 тэмдэгт байх ёстой"]
     },
-    birthday:{
-        type: Date,
-        required: true,
-    },
+    // birthday:{
+    //     type: Date,
+    //     required: true,
+    // },
     phoneNumber:{
         type: Number,
         required: true,

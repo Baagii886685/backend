@@ -1,12 +1,16 @@
-const { MongoClient, ObjectID } = require('mongodb');
+const { MongoClient, ObjectId } = require('mongodb');
 //моделууд
 const users = require("../models/user");
 const infoNews = require("../models/infoNews");
-
+const borderPort = require("../models/borderPort");
+const borderPortTime = require("../models/portTimeTable");
+const mendchilgee = require("../models/dargiinMendchilgee");
+const taniltsuulga = require("../models/alsiinKharaaZorilgo");
 //middleware
 const MyError = require("../utils/MyError");
 const asyncHandler = require("../middleware/asyncHandler");
 const path = require("path");
+// const portTimeTable = require('../models/portTimeTable');
 
 
 //функцууд
@@ -15,6 +19,96 @@ const path = require("path");
   res.status(200).json({
     success: true,
     data: allNewsInfo,
+  });
+
+});
+//Боомтуудын мэдээлэл харах mounted-р дуудаж байгаа
+const borderInfo = asyncHandler(async (req, res, next) =>{
+  const allBorderPortInfo = await borderPort.find();
+  // console.log("request");
+  res.status(200).json({
+    success: true,
+    data: allBorderPortInfo,
+  });
+});
+
+//боомтын цагын хуваарь хадгалах
+const portTimeSave = asyncHandler(async (req, res, next) =>{
+  try{
+    console.log("req.body=>", req.body);
+    for(const value of req.body.ognoo){
+      console.log("value=>", value.time);
+    }
+    const elData = {
+      portOgnoo: req.body.ognoo,
+      createUserId: req.body.userId,
+      borderPortId: req.body.portId,
+    }
+    const myData = new borderPortTime(elData);
+    await myData.save();
+    res.status(200).json({
+      success: true,   
+      data: "Амжилттай",
+    });
+  }catch(err){
+    console.log("Алдаа гарлаа");
+  }
+});
+
+//Боомт нэмэх хадгалах аргумент цагийн хувиараас бусад бүх мэдээлэл орж ирнэ
+const borderPortAdd = asyncHandler(async (req, res, next) =>{
+  const file = req.files;
+  console.log("Боомт =>", req.body);
+  const myArray = [];
+  const value = req.body.urtrag + ", " +  req.body.orgorog;
+  myArray.push(value)
+  console.log("value => ", value);
+  file.portImage1.name = `portPhoto_${file.portImage1.md5}${path.parse(file.portImage1.name).ext}`;
+  file.portImage2.name = `portPhoto_${file.portImage2.md5}${path.parse(file.portImage2.name).ext}`;
+  // console.log("req.files =>", req.files);
+
+  file.portImage1.mv(`${process.env.BORDER_PORT_UPLOAD_PATH}/${file.portImage1.name}`, (err) => {
+    if (err) {
+      throw new MyError(
+        "файлыг хуулах явцад алдаа гарлаа. ",
+        err.message,
+        400
+      );
+    }
+  });
+
+  file.portImage2.mv(`${process.env.BORDER_PORT_UPLOAD_PATH}/${file.portImage2.name}`, (err) => {
+    if (err) {
+      throw new MyError(
+        "файлыг хуулах явцад алдаа гарлаа. ",
+        err.message,
+        400
+      );
+    }
+  });
+
+  const borderPortData = {
+    name : req.body.name,
+    ognoo: req.body.ognoo,
+    desc: req.body.desc,
+    borderKm: req.body.borderKm,
+    sumiinTovKm: req.body.sumiinTovKm,
+    clanKm: req.body.clanKm,
+    cityKm: req.body.cityKm,
+    desc1: req.body.desc1,
+    desc2: req.body.desc2,
+    desc3: req.body.desc3,
+    region: req.body.region,
+    portImage1: `${process.env.BORDER_PORT_UPLOAD_PATH}/${file.portImage1.name}`,
+    portImage2: `${process.env.BORDER_PORT_UPLOAD_PATH}/${file.portImage2.name}`,
+    location: value,
+    createUserId: req.body.userId,
+  }
+  const myData = new borderPort(borderPortData);
+  await myData.save();
+  res.status(200).json({
+    success: true,
+    data: "aмжилттай хадгалагдлаа",
   });
 
 });
@@ -37,7 +131,83 @@ const infoDelete = asyncHandler(async (req, res, next) => {
       data: "Устгахад алдаа гарлаа",
     });
   }
-})
+});
+//Боомтуудын цагийн хуваарь оруулахад боомтуудын нэрийг авна. mounted-р ажиллаж байгаа аргумент userId token
+const borderPortViewNames = asyncHandler(async (req, res, next) =>{
+  // console.log("object", req.body);
+  if(req.body.userId){
+    const allPortname = await borderPort.aggregate(
+      [
+        {
+          $match:
+            {},
+        },
+        {
+          $project:
+            {
+              _id: 1,
+              name: 1,
+              // location: 1,
+            },
+        },
+      ]
+    );
+    res.status(200).json({
+      success: true,
+      data: allPortname,
+    });
+  }
+});
+//Боомтын байршил болон нэр авах
+const borderLocation = asyncHandler(async (req, res, next) =>{
+  const allBorderPortLocation = await borderPort.aggregate(
+    [
+      {
+        $match:
+          {},
+      },
+      {
+        $lookup:
+          {
+            from: "porttimetables",
+            localField: "_id",
+            foreignField: "borderPortId",
+            as: "result",
+          },
+      },
+      {
+        $replaceRoot:
+          {
+            newRoot: {
+              $mergeObjects: [
+                {
+                  $arrayElemAt: ["$result", 0],
+                },
+                "$$ROOT",
+              ],
+            },
+          },
+      },
+      {
+        $project:
+          {
+            _id: 1,
+            name: 1,
+            location: 1,
+            borderKm: 1,
+            desc1: 1,
+            desc2: 1,
+            portOgnoo: 1,
+          },
+      },
+    ]
+  );
+  // console.log("request", allBorderPortLocation);
+  res.status(200).json({
+    success: true,
+    data: allBorderPortLocation,
+  });
+});
 
 //Шинэ мэдээ мэдээлэл оруулахад энэ функц дуудагдана. --мэдээний гарчиг, зураг текст бүгд орж ирнэ.
  const medeeHadgalah = asyncHandler(async (req, res, next) =>{
@@ -100,7 +270,7 @@ const login = asyncHandler(async (req, res, next) => {
           message: "Нэвтрэх нэр эсвэл нууц үг буруу байна",
         });
       } else {
-        console.log("зөв байна");
+        // console.log("зөв байна");
         const token = user.getJsonWebToken();
         // console.log("token =>", token);
         // console.log("user : ", user);
@@ -125,25 +295,20 @@ const login = asyncHandler(async (req, res, next) => {
 
 //хэрэглэгч бүртгэх
 const userRegister = asyncHandler(async (req, res, next) => {
-    // const date = new Date();
-    // const year = date.getFullYear().toString().substring(2, 4);
-    // const randomNumber = randomize("0", 7).toString();
-    //хэрэглэгч бүртгүүлхэд дурын тоо үүсгээд А гаар эхэлсэн код олгож байна нэвтрэхдээ ашиглах
-    // const useg = "A";
-    // const userCode = useg.concat(year).concat(randomNumber);
-    // console.log("  code => :", userCode);
-    console.log("req.body", req.body);
+
+    // console.log("req.body", req.body);
  
     let data = {
       username: req.body.username,
-      firstName: req.body.firstName,
-      lastName: req.body.lastName,
-      birthday: req.body.birthday,
+      firstName: req.body.firstname,
+      lastName: req.body.lastname,
+      // birthday: req.body.birthday,
       phoneNumber: req.body.phoneNumber,
       email: req.body.email,
+      userType: req.body.userType,
       password: req.body.password,
     };
-    console.log("data =>", data);
+    // console.log("data =>", data);
     const myData = new users(data);
     const result = await myData.save();
     const token = result.getJsonWebToken();
@@ -154,11 +319,181 @@ const userRegister = asyncHandler(async (req, res, next) => {
       code: result.username,
     });
   });
-module.exports = {
 
-login,
-userRegister,
-medeeHadgalah,
-medeeHarah,
-infoDelete,
+//Боомтуудын цагийн хуваарь харуулан mounted-р ажиллаж байгаа
+// const borderPortTimeView = asyncHandler(async (req, res, next) =>{
+//   console.log("req.body=>", req.body);     
+//   const doc = await borderPortTime.aggregate([
+//     {
+//       $lookup:
+//         {
+//           from: "borderports",
+//           localField: "borderPortId",
+//           foreignField: "_id",
+//           as: "result",
+//         },
+//     },
+//     {
+//       $replaceRoot:
+//         {
+//           newRoot: {
+//             $mergeObjects: [
+//               {
+//                 $arrayElemAt: ["$result", 0],
+//               },
+//               "$$ROOT",
+//             ],
+//           },
+//         },
+//     },
+//     {
+//       $project:
+//         {
+//           _id: 1,
+//           name: 1,
+//           ognoo: 1,
+//           region: 1,
+//           portImage1: 1,
+//           borderKm: 1,
+//         },
+//     },
+//   ]);
+//   res.status(200).json({
+//     success: true,
+//     data: doc,
+//   });
+// });
+//газрын зураг дээр байгаа боомтын байршил дээр дархад тухайн боомтын Id орж ирнэ. Тэр боомтын цагын хуваарийг буцаана.
+const portTime = asyncHandler(async (req, res, next) =>{
+  try{
+    console.log("хүсэлт ирлээ");
+    const doc = await borderPortTime.aggregate([
+      {
+        $match:
+          {
+            borderPortId: new ObjectId(req.body.myData) ,
+          },
+      },
+    ]);
+    // console.log("doc=>", doc);
+    return res.status(200).send({
+      success: true,
+      data: doc,
+    });
+  }catch(err){
+    return res.status(500).send({
+      success: true,
+      data: "Боомтын цагын хуваарь олдсонгүй",
+    });
+  }
+});
+
+//Мэндчилгээ хадгалах
+const mendchilgeeHadgalah = asyncHandler(async (req, res, next) =>{
+  const file = req.files;
+  // console.log("this.file", req.files);
+  file.photo.name = `dargaPhoto_${file.photo.md5}${path.parse(file.photo.name).ext}`;
+  // console.log("req.files =>", req.files);
+
+  file.photo.mv(`${process.env.DARGA_PHOTO_UPLOAD_PATH}/${file.photo.name}`, (err) => {
+    if (err) {
+      throw new MyError(
+        "файлыг хуулах явцад алдаа гарлаа. ",
+        err.message,
+        400
+      );
+    }
+  });
+
+  const datgaMendchilgee = {
+    textarea1 : req.body.textarea1,
+    textarea2: req.body.textarea2,
+    textarea3: req.body.textarea3,
+    textarea4: req.body.textarea4,
+    textarea5: req.body.textarea5,
+    input1: req.body.input1,
+    input2: req.body.input2,
+    photo: `${process.env.DARGA_PHOTO_UPLOAD_PATH}/${file.photo.name}`,
+    createUserId: req.body.userId,
+  }
+  const myData = new mendchilgee(datgaMendchilgee);
+  await myData.save();
+  res.status(200).json({
+    success: true,
+    data: "aмжилттай хадгалагдлаа",
+  });
+});
+
+//Даргын мэндчилгээ харах
+const dargaMendchilgee = asyncHandler(async (req, res, next) => {
+  try {
+    // Assuming mendchilgee is a Mongoose model
+    const docs = await mendchilgee.find({}); // Finding all documents
+
+    res.status(200).json({
+      success: true,
+      data: docs,
+    });
+  } catch (error) {
+    // Handle errors appropriately
+    next(error);
+  }
+});
+
+//алсын хараа хадгалах
+const taniltsuulgaHadgalah = asyncHandler(async (req, res, next) => {
+  // console.log("req.body =>", req.body);
+  try{
+    const myDataa = {
+      name : req.body.alsiinKharaa,
+      text1: req.body.alsiinKharaa1,
+      text2: req.body.alsiinKharaa2,
+      text3: req.body.alsiinKharaa3,
+      text4: req.body.alsiinKharaa4,
+      text5: req.body.alsiinKharaa5,
+      createUserId: req.body.userId,
+    }
+    const myData = new taniltsuulga(myDataa);
+    await myData.save();
+    res.status(200).json({
+      success: true,
+      data: "aмжилттай хадгаллаа",
+    });
+  }catch(err){
+    console.log("Алдаа гарлаа");
+  }
+});
+
+//Танилцуулга цэс рүү орход харуулах мэдээллийг татна.
+const taniltsuulgaView = asyncHandler(async (req, res, next) => {
+  try {
+    // Assuming mendchilgee is a Mongoose model
+    const docs = await taniltsuulga.find({}); // Finding all documents
+
+    res.status(200).json({
+      success: true,
+      data: docs,
+    });
+  } catch (error) {
+    // Handle errors appropriately
+    next(error);
+  }
+})
+module.exports = {
+  dargaMendchilgee,
+  mendchilgeeHadgalah,
+  login,
+  userRegister,
+  medeeHadgalah,
+  medeeHarah,
+  infoDelete,
+  borderPortAdd,
+  borderInfo,
+  borderLocation,
+  borderPortViewNames,
+  portTimeSave,
+  // borderPortTimeView,
+  portTime,
+  taniltsuulgaHadgalah,
+  taniltsuulgaView,
 };
