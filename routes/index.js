@@ -2,22 +2,29 @@ const express = require("express"); //import express
 const router = express.Router();
 
 const {
-medeeHarah,
-login,
-userRegister,
-medeeHadgalah,
-infoDelete,
-borderPortAdd,
-borderInfo,
-borderLocation,
-borderPortViewNames,
-portTimeSave,
-// borderPortTimeView,
-portTime, 
-mendchilgeeHadgalah,
-dargaMendchilgee,
-taniltsuulgaHadgalah,
-taniltsuulgaView,
+    medeeHarah,
+    login,
+    userRegister,
+    medeeHadgalah,
+    infoDelete,
+    borderPortAdd,
+    borderInfo,
+    borderLocation,
+    borderPortViewNames,
+    portTimeSave,
+    // borderPortTimeView,
+    portTime,
+    mendchilgeeHadgalah,
+    dargaMendchilgee,
+    taniltsuulgaHadgalah,
+    taniltsuulgaView,
+    baiguullagaTuuhHadgalah,
+    tuuhHaruulah,
+    tuuhustgah,
+    butetsHadgalah,
+    butetsHaray,
+    mendchilgeeUstgah,
+    isPortTimeSave,
 } = require("../controller/HomeController");
 // const { userAdd } = require("../controller/usersController");
 //mounted
@@ -28,6 +35,7 @@ router.route("/borderPortViewNames").post(borderPortViewNames);
 // router.route("/borderPortTime").post(borderPortTimeView);
 router.route("/dargaMendchilgee").post(dargaMendchilgee);
 router.route("/taniltsuulgaView").post(taniltsuulgaView);
+router.route("/butetsHaray").post(butetsHaray);
 
 
 //click
@@ -37,10 +45,15 @@ router.route("/medeeHadgalah").post(medeeHadgalah);
 router.route("/portTimeSave").post(portTimeSave);
 router.route("/portTime").post(portTime);
 router.route("/mendchilgeeHadgalah").post(mendchilgeeHadgalah);
-
 router.route("/infoDelete").post(infoDelete);
 router.route("/borderPortAdd").post(borderPortAdd);
 router.route("/taniltsuulgaHadgalah").post(taniltsuulgaHadgalah);
+router.route("/tuuhHadgalah").post(baiguullagaTuuhHadgalah);
+router.route("/tuuhHaruulah").post(tuuhHaruulah);
+router.route("/tuuhustgah").post(tuuhustgah);
+router.route("/butetsHadgalah").post(butetsHadgalah);
+router.route("/mendchilgeeUstgah").post(mendchilgeeUstgah);
+router.route("/isPortTimeSave").post(isPortTimeSave);
 
 
 module.exports = router;
