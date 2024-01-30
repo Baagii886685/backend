@@ -37,7 +37,7 @@ const borderInfo = asyncHandler(async (req, res, next) => {
   });
 });
 
-//боомтын цагын хуваарь хадгалах
+//боомтын цагийн хуваарь хадгалах
 const portTimeSave = asyncHandler(async (req, res, next) => {
   try {
     // console.log("req.body =>", req.body);
@@ -436,7 +436,7 @@ const userRegister = asyncHandler(async (req, res, next) => {
 //     data: doc,
 //   });
 // });
-//газрын зураг дээр байгаа боомтын байршил дээр дархад тухайн боомтын Id орж ирнэ. Тэр боомтын цагын хуваарийг буцаана.
+//газрын зураг дээр байгаа боомтын байршил дээр дархад тухайн боомтын Id орж ирнэ. Тэр боомтын цагийн хуваарийг буцаана.
 const portTime = asyncHandler(async (req, res, next) => {
   try {
     console.log("хүсэлт ирлээ");
@@ -456,7 +456,7 @@ const portTime = asyncHandler(async (req, res, next) => {
   } catch (err) {
     return res.status(500).send({
       success: true,
-      data: "Боомтын цагын хуваарь олдсонгүй",
+      data: "Боомтын цагийн хуваарь олдсонгүй",
     });
   }
 });
@@ -673,7 +673,7 @@ const mendchilgeeUstgah = asyncHandler(async (req, res, next) => {
 
 });
 
-// боомтын цагын хувиарын өөрчлөлт хадгалах
+// боомтын цагийн хувиарын өөрчлөлт хадгалах
 const isPortTimeSave = asyncHandler(async (req, res, next) => {
 
   try {

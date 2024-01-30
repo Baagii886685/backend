@@ -41,43 +41,43 @@ const boomtTsagiinHuvaariNew = new mongoose.Schema({
     isEndTime: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isTsaiStartTime: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isTsaiEndTime: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isPortDescription: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isValue1: [Date, Date],
     isAdditionName: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isAdditionStartTime: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isAdditionEndTime: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isAdditionTsaiStartTime: {
         type: String,
         trim: true,
-        // required: [true, "Боомтын хаах цагын хуваарь оруулна уу"],
+        // required: [true, "Боомтын хаах цагийн хуваарь оруулна уу"],
     },
     isCheckboxGroup1: [
         {
