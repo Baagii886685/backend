@@ -37,7 +37,7 @@ const borderInfo = asyncHandler(async (req, res, next) => {
   });
 });
 
-//боомтын цагийн хуваарь хадгалах
+//цагийн хуваарь хадгалах
 const portTimeSave = asyncHandler(async (req, res, next) => {
   try {
     // console.log("req.body =>", req.body);
@@ -75,7 +75,7 @@ const portTimeSave = asyncHandler(async (req, res, next) => {
   }
 });
 
-//Боомт нэмэх хадгалах аргумент цагийн хувиараас бусад бүх мэдээлэл орж ирнэ
+//Боомт нэмэх хадгалах аргумент цагийн хуваарьаас бусад бүх мэдээлэл орж ирнэ
 const borderPortAdd = asyncHandler(async (req, res, next) => {
   const file = req.files;
   console.log("Боомт =>", req.body);
@@ -393,50 +393,7 @@ const userRegister = asyncHandler(async (req, res, next) => {
   });
 });
 
-//Боомтуудын цагийн хуваарь харуулан mounted-р ажиллаж байгаа
-// const borderPortTimeView = asyncHandler(async (req, res, next) =>{
-//   console.log("req.body=>", req.body);     
-//   const doc = await borderPortTime.aggregate([
-//     {
-//       $lookup:
-//         {
-//           from: "borderports",
-//           localField: "borderPortId",
-//           foreignField: "_id",
-//           as: "result",
-//         },
-//     },
-//     {
-//       $replaceRoot:
-//         {
-//           newRoot: {
-//             $mergeObjects: [
-//               {
-//                 $arrayElemAt: ["$result", 0],
-//               },
-//               "$$ROOT",
-//             ],
-//           },
-//         },
-//     },
-//     {
-//       $project:
-//         {
-//           _id: 1,
-//           name: 1,
-//           ognoo: 1,
-//           region: 1,
-//           portImage1: 1,
-//           borderKm: 1,
-//         },
-//     },
-//   ]);
-//   res.status(200).json({
-//     success: true,
-//     data: doc,
-//   });
-// });
-//газрын зураг дээр байгаа боомтын байршил дээр дархад тухайн боомтын Id орж ирнэ. Тэр боомтын цагийн хуваарийг буцаана.
+//газрын зураг дээр байгаа боомтын байршил дээр дархад тухайн боомтын Id орж ирнэ. Тэр цагийнхуваарийг буцаана.
 const portTime = asyncHandler(async (req, res, next) => {
   try {
     console.log("хүсэлт ирлээ");
@@ -456,7 +413,7 @@ const portTime = asyncHandler(async (req, res, next) => {
   } catch (err) {
     return res.status(500).send({
       success: true,
-      data: "Боомтын цагийн хуваарь олдсонгүй",
+      data: "цагийнхуваарь олдсонгүй",
     });
   }
 });
@@ -673,7 +630,7 @@ const mendchilgeeUstgah = asyncHandler(async (req, res, next) => {
 
 });
 
-// боомтын цагийн хувиарын өөрчлөлт хадгалах
+// цагийнхуваарьын өөрчлөлт хадгалах
 const isPortTimeSave = asyncHandler(async (req, res, next) => {
 
   try {
@@ -715,7 +672,105 @@ const isPortTimeSave = asyncHandler(async (req, res, next) => {
 });
 
 
+// Боомт устгах
+const borderPortDelete = asyncHandler(async (req, res, next) =>{
+  try {
+    // console.log("object=>", req.body);
+    const value = await boomtTsagiinHuvaariNew.deleteMany({ isBorderPortId: req.body.portId });
+    // console.log("value =>", value.acknowledged);
+    const timesDelete = await borderPortTime.deleteMany({ borderPortId: req.body.portId});
+    // console.log("timesDelete =>", timesDelete.acknowledged);
+    const result = await borderPort.deleteOne({ _id: req.body.portId });
+    if (result.acknowledged === true && value.acknowledged === true && timesDelete.acknowledged  === true) {
+      res.status(200).json({
+        success: true,
+        data: "Устгагдлаа",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        data: "Устгахад алдаа гарлаа",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+// Боомтын үндсэн цагын хуваарь харах боомтын id орж ирнэ тэр id-р хайж олоод цагийн хуваарь буцаана.
+const portMainTimeView =  asyncHandler(async (req, res, next) =>{
+  try{
+    const docs = await borderPortTime.find({ borderPortId: req.body.portId});
+    // console.log("docs =>", docs);
+    if(docs){
+      res.status(200).json({
+        success: true,
+        data: docs,
+      });
+    }
+  }catch(error){
+    console.log("алдаа гарлаа", error);
+  }
+});
+
+// Боомтын үндсэн цагийн хуваарь устгах
+const borderPortTimeDelete = asyncHandler(async (req, res, next) =>{
+  try {
+    const result = await borderPortTime.deleteMany({ _id: req.body.myId });
+    if (result) {
+      res.status(200).json({
+        success: true,
+        data: "Цагийн хуваарьыг устаглаа.",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        data: "Устгахад алдаа гарлаа",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+const portaddTimeDelete = asyncHandler(async (req, res, next) =>{
+  try {
+    const result = await boomtTsagiinHuvaariNew.deleteMany({ _id: req.body.myId });
+    if (result) {
+      res.status(200).json({
+        success: true,
+        data: "Цагийн хуваарийг устаглаа.",
+      });
+    } else {
+      res.status(200).json({
+        success: true,
+        data: "Устгахад алдаа гарлаа",
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+const borderPortNewTimes = asyncHandler(async (req, res, next) =>{
+  try{
+    // console.log("req.body =>", req.body);
+    const docs = await boomtTsagiinHuvaariNew.find({ isBorderPortId: req.body.portId});
+    // console.log("docs =>", docs);
+    if(docs){
+      res.status(200).json({
+        success: true,
+        data: docs,
+      });
+    }
+  }catch(error){
+    console.log("алдаа гарлаа", error);
+  }
+});
 module.exports = {
+  portaddTimeDelete,
+  borderPortNewTimes,
+  borderPortDelete,
+  portMainTimeView,
   isPortTimeSave,
   tuuhHaruulah,
   dargaMendchilgee,
@@ -738,4 +793,5 @@ module.exports = {
   butetsHadgalah,
   butetsHaray,
   mendchilgeeUstgah,
+  borderPortTimeDelete,
 };

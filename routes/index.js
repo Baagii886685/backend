@@ -25,6 +25,11 @@ const {
     butetsHaray,
     mendchilgeeUstgah,
     isPortTimeSave,
+    borderPortDelete,
+    portMainTimeView,
+    borderPortTimeDelete,
+    borderPortNewTimes,
+    portaddTimeDelete,
 } = require("../controller/HomeController");
 // const { userAdd } = require("../controller/usersController");
 //mounted
@@ -54,6 +59,11 @@ router.route("/tuuhustgah").post(tuuhustgah);
 router.route("/butetsHadgalah").post(butetsHadgalah);
 router.route("/mendchilgeeUstgah").post(mendchilgeeUstgah);
 router.route("/isPortTimeSave").post(isPortTimeSave);
+router.route("/borderPortDelete").post(borderPortDelete);
+router.route("/portMainTimeView").post(portMainTimeView);
+router.route("/borderPortTimeDelete").post(borderPortTimeDelete);
+router.route("/borderPortNewTimes").post(borderPortNewTimes);
+router.route("/PortaddTimeDelete").post(portaddTimeDelete);
 
 
 module.exports = router;
