@@ -40,7 +40,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 app.use(errorHandler);
-
 const connectDB = require("./config/db");
 connectDB();
 const server = app.listen(process.env.PORT, function () {
